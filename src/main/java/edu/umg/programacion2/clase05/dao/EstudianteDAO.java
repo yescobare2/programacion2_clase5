@@ -31,7 +31,7 @@ public class EstudianteDAO {
 
     // 1. CREATE: inserta un estudiante nuevo y retorna el id que le asigno MySQL.
     public int crear(Estudiante estudiante) throws SQLException {
-        String sql = "INSERT INTO estudiantes (nombre, carnet, tipo, activo) VALUES (?, ?)";
+        String sql = "INSERT INTO estudiantes (nombre, carnet, tipo, activo) VALUES (?,?, ?, ?)";
 
         try (Connection conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);
              PreparedStatement statement = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {

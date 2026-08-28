@@ -12,12 +12,14 @@ USE prog2_db;
 CREATE TABLE IF NOT EXISTS estudiantes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
-    carnet VARCHAR(20) NOT NULL UNIQUE
+    carnet VARCHAR(20) NOT NULL UNIQUE,
+    activo TINYINT (1) DEFAULT 1,
+    tipo VARCHAR (30) DEFAULT 'Pregrado'
 );
 
 -- INSERT IGNORE: si el carnet ya existe (por ejemplo porque ya corriste este script
 -- antes) MySQL ignora esa fila en lugar de lanzar un error de duplicado.
-INSERT IGNORE INTO estudiantes (nombre, carnet) VALUES
-    ('Ana Lopez', '2024001'),
-    ('Carlos Perez', '2024002'),
-    ('Maria Gonzalez', '2024003');
+INSERT IGNORE INTO estudiantes (nombre, carnet, tipo) VALUES
+    ('Ana Lopez', '2024001', 'Pregrado'),
+    ('Carlos Perez', '2024002', 'Posgrado'),
+    ('Maria Gonzalez', '2024003', 'Pregrado');
