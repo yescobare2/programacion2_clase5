@@ -14,17 +14,21 @@ public class Estudiante {
     private int id;
     private String nombre;
     private String carnet;
+    private String tipo;
+    private boolean activo;
 
-    public Estudiante(int id, String nombre, String carnet) {
+    public Estudiante(int id, String nombre, String carnet, String tipo, boolean activo) {
         this.id = id;
         this.nombre = nombre;
         this.carnet = carnet;
+        this.tipo = tipo;
+        this.activo = activo;
     }
 
     // Constructor de conveniencia para cuando todavia no existe en la base de
     // datos (por eso id = 0: MySQL le va a asignar el id real al insertarlo).
-    public Estudiante(String nombre, String carnet) {
-        this(0, nombre, carnet);
+    public Estudiante(String nombre, String carnet, String tipo) {
+        this(0, nombre, carnet, tipo, true);
     }
 
     public int getId() {
@@ -43,8 +47,26 @@ public class Estudiante {
         return carnet;
     }
 
-    @Override
+    
+    public String getTipo() {
+		return tipo;
+	}
+
+	public void setTipo(String tipo) {
+		this.tipo = tipo;
+	}
+
+	public boolean isActivo() {
+		return activo;
+	}
+
+	public void setActivo(boolean activo) {
+		this.activo = activo;
+	}
+
+	@Override
     public String toString() {
-        return String.format("[%d] %s - carnet %s", id, nombre, carnet);
+		String estadoStr = activo ? "Activo" : "Inactivo";
+        return String.format("[%d] %s - Carnet: %s | Tipo: %s | Estado: %s", id, nombre, carnet, tipo, estadoStr);
     }
 }
