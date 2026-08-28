@@ -31,13 +31,15 @@ public class EstudianteDAO {
 
     // 1. CREATE: inserta un estudiante nuevo y retorna el id que le asigno MySQL.
     public int crear(Estudiante estudiante) throws SQLException {
-        String sql = "INSERT INTO estudiantes (nombre, carnet) VALUES (?, ?)";
+        String sql = "INSERT INTO estudiantes (nombre, carnet, tipo, activo) VALUES (?, ?)";
 
         try (Connection conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);
              PreparedStatement statement = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             statement.setString(1, estudiante.getNombre());
             statement.setString(2, estudiante.getCarnet());
+            statement.setString(3, estudiante.getTipo());
+            statemente.setboolean(4, true);
             statement.executeUpdate();
 
             // IMPORTANTE: RETURN_GENERATED_KEYS + getGeneratedKeys() es como se
@@ -52,9 +54,9 @@ public class EstudianteDAO {
         }
     }
 
-    // 2. READ (todos): retorna la lista completa de estudiantes.
+    // 2. READ (Consultas existentes) NO trae estudiantes Inactivos
     public List<Estudiante> listarTodos() throws SQLException {
-        String sql = "SELECT id, nombre, carnet FROM estudiantes ORDER BY id";
+        String sql = "SELECT id, nombre, carnet, tipo, activo FROM estudiantes WHERE activo = 1 ORDER BY id";
         List<Estudiante> estudiantes = new ArrayList<>();
 
         try (Connection conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);
@@ -68,11 +70,25 @@ public class EstudianteDAO {
         return estudiantes;
     }
 
-    // 3. READ (uno): busca un estudiante por carnet. Optional evita retornar un
-    // null "silencioso" cuando no se encuentra nada; obliga a quien llama este
-    // metodo a manejar explicitamente el caso "no existe".
+ // 3. READ (Solo Inactivos)
+    public List<Estudiante> listarInactivos() throws SQLException {
+        String sql = "SELECT id, nombre, carnet, tipo, activo FROM estudiantes WHERE activo = 0 ORDER BY id";
+        List<Estudiante> estudiantes = new ArrayList<>();
+
+        try (Connection conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);
+             PreparedStatement statement = conexion.prepareStatement(sql);
+             ResultSet resultado = statement.executeQuery()) {
+
+            while (resultado.next()) {
+                estudiantes.add(mapearFila(resultado));
+            }
+        }
+        return estudiantes;
+    }
+     
+ // 4. READ (Por Carnet): Retorna Optional.empty() si no existe o si está inactivo
     public Optional<Estudiante> buscarPorCarnet(String carnet) throws SQLException {
-        String sql = "SELECT id, nombre, carnet FROM estudiantes WHERE carnet = ?";
+        String sql = "SELECT id, nombre, carnet, tipo, activo FROM estudiantes WHERE carnet = ?";
 
         try (Connection conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);
              PreparedStatement statement = conexion.prepareStatement(sql)) {
@@ -81,6 +97,11 @@ public class EstudianteDAO {
 
             try (ResultSet resultado = statement.executeQuery()) {
                 if (resultado.next()) {
+                	Estudiante est= mapearFila(resultado);
+                	if (!est.isActivo()) {
+                		System.out.println("El estudiante existe pero se encuentra INACTIVO");
+                		return Optional.empty();
+                	}
                     return Optional.of(mapearFila(resultado));
                 }
                 return Optional.empty();
