@@ -1,0 +1,50 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>umg.edu.gt.progra2</groupId>
+  <artifactId>clase05.jdbc.con.maven</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>Clase 5 - JDBC con Maven</name>
+  <description>Primer contacto con un motor de base de datos (MySQL) desde Java, usando Maven para manejar la dependencia del driver JDBC.</description>
+
+  <properties>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+    <!-- Unica dependencia nueva: el driver JDBC de MySQL. Maven lo descarga solo
+         desde Maven Central y lo agrega al classpath del proyecto. Compara esto
+         con clase05-jdbc-sin-maven, donde ese mismo .jar hay que descargarlo y
+         referenciarlo a mano. -->
+    <dependency>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
+      <version>8.0.33</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.2.0</version>
+        <configuration>
+          <mainClass>edu.umg.programacion2.clase05.Main</mainClass>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>edu.umg.programacion2.clase05.Main</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
