@@ -110,7 +110,7 @@ public class EstudianteDAO {
     }
 
     // 5 UPDATE: Actualizar nombre y tipo
-    public boolean actualizarNombre(String carnet, String nuevoNombre, String nuevoTipo) throws SQLException {
+    public boolean actualizar(String carnet, String nuevoNombre, String nuevoTipo) throws SQLException {
         String sql = "UPDATE estudiantes SET nombre = ?, tipo = ?  WHERE carnet = ?";
 
         try (Connection conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);

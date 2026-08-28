@@ -42,22 +42,25 @@ public class Main {
                     listarEstudiantes();
                     break;
                 case 3:
-                    buscarEstudiante();
+                	listarInactivos();
                     break;
                 case 4:
-                    actualizarEstudiante();
+                    buscarEstudiante();
                     break;
                 case 5:
-                    eliminarEstudiante();
+                    actualizarEstudiante();
                     break;
                 case 6:
+                	eliminarEstudiante();
+                	break; 
+                case 7:
                     System.out.println("Hasta luego.");
                     break;
                 default:
                     System.out.println("Opcion invalida. Intenta de nuevo.");
             }
             System.out.println();
-        } while (opcion != 6);
+        } while (opcion != 7);
 
         teclado.close();
     }
@@ -66,10 +69,11 @@ public class Main {
         System.out.println("=== CRUD de Estudiantes (MySQL) ===");
         System.out.println("1. Agregar estudiante");
         System.out.println("2. Listar todos los estudiantes");
-        System.out.println("3. Buscar estudiante por carnet");
-        System.out.println("4. Actualizar nombre de un estudiante");
-        System.out.println("5. Eliminar estudiante");
-        System.out.println("6. Salir");
+        System.out.println("3. Listar estudiantes INACTIVOS");
+        System.out.println("4. Buscar estudiantes por carnet");
+        System.out.println("5. Actualizar estudiante");
+        System.out.println("6. Dar de baja estudiante (Inactivar)");
+        System.out.println("7. Salir");
         System.out.print("Elige una opcion: ");
     }
 
@@ -92,9 +96,11 @@ public class Main {
         String nombre = teclado.nextLine();
         System.out.print("Carnet: ");
         String carnet = teclado.nextLine();
-
+        System.out.println("Tipo (Pregrado/Posgrado): ");
+        String tipo = teclado.nextLine();
+        
         try {
-            int id = estudianteDAO.crear(new Estudiante(nombre, carnet));
+            int id = estudianteDAO.crear(new Estudiante(nombre, carnet, tipo));
             System.out.println("Estudiante creado con id " + id);
         } catch (SQLException e) {
             // Cuidado: nunca dejen un catch vacio. Como minimo, impriman el
@@ -119,6 +125,21 @@ public class Main {
         }
     }
 
+    private static void listarInactivos() {
+        try {
+            List<Estudiante> estudiantes = estudianteDAO.listarInactivos();
+            if (estudiantes.isEmpty()) {
+                System.out.println("No hay estudiantes inactivos.");
+                return;
+            }
+            for (Estudiante estudiante : estudiantes) {
+                System.out.println(estudiante);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al listar inactivos: " + e.getMessage());
+        }
+    }
+    
     private static void buscarEstudiante() {
         System.out.print("Carnet a buscar: ");
         String carnet = teclado.nextLine();
@@ -128,7 +149,7 @@ public class Main {
             if (estudiante.isPresent()) {
                 System.out.println("Encontrado: " + estudiante.get());
             } else {
-                System.out.println("No existe ningun estudiante con ese carnet.");
+                System.out.println("No se pudo mostrar el estudiante.");
             }
         } catch (SQLException e) {
             System.err.println("Error al buscar el estudiante: " + e.getMessage());
@@ -140,11 +161,13 @@ public class Main {
         String carnet = teclado.nextLine();
         System.out.print("Nuevo nombre: ");
         String nuevoNombre = teclado.nextLine();
-
+        System.out.print("Nuevo tipo: ");
+        String nuevoTipo = teclado.nextLine();
+        
         try {
-            boolean actualizado = estudianteDAO.actualizarNombre(carnet, nuevoNombre);
+            boolean actualizado = estudianteDAO.actualizar(carnet, nuevoNombre, nuevoTipo);
             if (actualizado) {
-                System.out.println("Nombre actualizado.");
+                System.out.println("datos actualizados correctamente.");
             } else {
                 System.out.println("No existe ningun estudiante con ese carnet.");
             }
@@ -154,18 +177,18 @@ public class Main {
     }
 
     private static void eliminarEstudiante() {
-        System.out.print("Carnet del estudiante a eliminar: ");
+        System.out.print("Carnet del estudiante a dar de baja: ");
         String carnet = teclado.nextLine();
 
         try {
             boolean eliminado = estudianteDAO.eliminar(carnet);
             if (eliminado) {
-                System.out.println("Estudiante eliminado.");
+                System.out.println("Estudiante dado de baja (marcado como inactivo).");
             } else {
                 System.out.println("No existe ningun estudiante con ese carnet.");
             }
         } catch (SQLException e) {
-            System.err.println("Error al eliminar el estudiante: " + e.getMessage());
+            System.err.println("Error al dar de baja al estudiante: " + e.getMessage());
         }
     }
 }
