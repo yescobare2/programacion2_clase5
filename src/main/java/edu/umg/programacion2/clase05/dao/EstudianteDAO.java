@@ -39,7 +39,7 @@ public class EstudianteDAO {
             statement.setString(1, estudiante.getNombre());
             statement.setString(2, estudiante.getCarnet());
             statement.setString(3, estudiante.getTipo());
-            statemente.setboolean(4, true);
+            statement.setBoolean(4, true);
             statement.executeUpdate();
 
             // IMPORTANTE: RETURN_GENERATED_KEYS + getGeneratedKeys() es como se
@@ -109,25 +109,25 @@ public class EstudianteDAO {
         }
     }
 
-    // 4. UPDATE: cambia el nombre de un estudiante existente, identificado por
-    // su carnet. Retorna true si se actualizo una fila, false si no existia.
-    public boolean actualizarNombre(String carnet, String nuevoNombre) throws SQLException {
-        String sql = "UPDATE estudiantes SET nombre = ? WHERE carnet = ?";
+    // 5 UPDATE: Actualizar nombre y tipo
+    public boolean actualizarNombre(String carnet, String nuevoNombre, String nuevoTipo) throws SQLException {
+        String sql = "UPDATE estudiantes SET nombre = ?, tipo = ?  WHERE carnet = ?";
 
         try (Connection conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);
              PreparedStatement statement = conexion.prepareStatement(sql)) {
 
             statement.setString(1, nuevoNombre);
-            statement.setString(2, carnet);
+            statement.setString(2, nuevoTipo);
+            statement.setString(3, carnet);
 
             int filasAfectadas = statement.executeUpdate();
             return filasAfectadas > 0;
         }
     }
 
-    // 5. DELETE: elimina un estudiante por carnet. Retorna true si elimino algo.
+    // 6. DELETE (soft Delete) cambia activo a 0
     public boolean eliminar(String carnet) throws SQLException {
-        String sql = "DELETE FROM estudiantes WHERE carnet = ?";
+        String sql = "UPDATE estudiantes SET activo = 0 WHERE carnet = ?";
 
         try (Connection conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);
              PreparedStatement statement = conexion.prepareStatement(sql)) {
@@ -140,12 +140,13 @@ public class EstudianteDAO {
     }
 
     // Metodo privado de apoyo: convierte la fila actual del ResultSet en un
-    // objeto Estudiante. Evita repetir este mismo codigo en listarTodos() y en
-    // buscarPorCarnet().
+    // objeto Estudiante. 
     private Estudiante mapearFila(ResultSet resultado) throws SQLException {
         int id = resultado.getInt("id");
         String nombre = resultado.getString("nombre");
         String carnet = resultado.getString("carnet");
-        return new Estudiante(id, nombre, carnet);
+        String tipo = resultado.getString("tipo");
+        boolean activo = resultado.getBoolean("activo");
+        return new Estudiante(id, nombre, carnet, tipo, activo);
     }
 }
